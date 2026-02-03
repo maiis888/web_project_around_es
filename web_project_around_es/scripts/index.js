@@ -79,9 +79,11 @@ toggleButtonState(profileInputList, profileSubmitButton);
 // Funciones
 function openModal(modal){
     modal.classList.add("popup_is-opened");
+    document.addEventListener("keydown", handleEscClose);
 }
 function closeModal(modal){
     modal.classList.remove("popup_is-opened");
+    document.removeEventListener("keydown", handleEscClose);
 }
 function handleOpenEditModal(){
     fillProfileForm();
@@ -205,3 +207,25 @@ function checkInputValidity (formElement, inputElement) {
         hideInputError (formElement, inputElement);
     }
 };
+
+//Close modal click overlay
+function closePopupOverlay (popupOverlay){
+    popupOverlay.addEventListener('mousedown', (evt) => {
+        if (evt.target === evt.currentTarget) {
+            closeModal(popupOverlay);
+        }
+    });
+}
+closePopupOverlay (editProfileModal);
+closePopupOverlay (newCardModal);
+closePopupOverlay (imageModal);
+
+//Close modal esc key
+function handleEscClose (evt){
+    if (evt.key === "Escape") {
+        const openedPopup = document.querySelector('.popup_is-opened');
+        if (openedPopup) {
+            closeModal(openedPopup);
+        }
+    }
+}
