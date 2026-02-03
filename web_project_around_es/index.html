@@ -9,7 +9,7 @@
     <meta content="ie=edge" http-equiv="X-UA-Compatible" />
     <title>Around The U.S.</title>
     <link rel="icon" href="./images/like-active.svg" type="image/x-icon">
-    <link href="./pages/index.css" rel="stylesheet" />
+    <link href="./styles/index.css" rel="stylesheet" />
   </head>
   <body class="page">
     <div class="page__content">
@@ -21,7 +21,7 @@
         />
       </header>
       <main class="content">
-        <section class="profile page__section">
+        <div class="profile page__section">
           <img class="profile__image" src="./images/avatar.jpg" alt="Avatar" />
           <div class="profile__info">
             <h1 class="profile__title">Jacques Cousteau</h1>
@@ -37,10 +37,10 @@
             class="profile__add-button"
             type="button"
           ></button>
-        </section>
-        <section class="cards page__section">
+        </div>
+        <div class="cards page__section">
         <ul class="cards__list"></ul>
-        </section>
+        </div>
       </main>
       <footer class="footer page__section">
         <p class="footer__copyright">© 2025 Around The U.S.</p>
@@ -52,7 +52,7 @@
             class="popup__close"
             type="button"
           ></button>
-          <h3 class="popup__title">Editar perfil</h3>
+          <h2 class="popup__title">Editar perfil</h2>
           <form class="popup__form" id="edit-profile-form" novalidate>
             <input
               type="text"
@@ -85,7 +85,7 @@
             class="popup__close"
             type="button"
           ></button>
-          <h3 class="popup__title">Nuevo lugar</h3>
+          <h2 class="popup__title">Nuevo lugar</h2>
           <form class="popup__form" id="new-card-form" novalidate>
             <input
               class="popup__input popup__input_type_card-name"
