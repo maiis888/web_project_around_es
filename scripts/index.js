@@ -1,4 +1,6 @@
-//1. Se queda en index
+import { openModal, closeModal, handleEscClose, closePopupOverlay } from "./utils.js";
+import { Card } from "./Card.js";
+
 const initialCards = [
     {
     name: "Valle de Yosemite",
@@ -25,8 +27,6 @@ const initialCards = [
     link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_lago.jpg",
     },
 ]
-
-
 
 //2. Se quedan en index.js (y se pasan a funciones de utils si hace falta).FormValidator no debe saber nada de modales ni de popups, solo de formularios. 
 const editProfileModal = document.querySelector("#edit-popup"); //Modal de edición de perfil
@@ -91,14 +91,7 @@ toggleButtonState(profileInputList, profileSubmitButton);
 
 //10. Estas funciones para abrir y cerrar modales irán en utils.js
 // Funciones
-function openModal(modal){
-    modal.classList.add("popup_is-opened");
-    document.addEventListener("keydown", handleEscClose);
-}
-function closeModal(modal){
-    modal.classList.remove("popup_is-opened");
-    document.removeEventListener("keydown", handleEscClose);
-}
+
 function handleOpenEditModal(){
     fillProfileForm();
     openModal(editProfileModal);
@@ -118,60 +111,41 @@ function handleProfileFormSubmit(evt) {
     closeModal(editProfileModal);
 }
 
-//13. Estas funciones irán en la clase Card
-function handleLikeButton(evt){
-    evt.target.classList.toggle("card__like-button_is-active");
-}
-function handleDeleteButton(evt) {
-const card = evt.target.closest(".card");
-card.remove();
-}
-function handlePreviewPicture(card){
-pictureElement.src = card.link;
-pictureCaption.textContent = card.name; 
-pictureElement.alt = card.name;
+function handlePreviewPicture({name, link}){
+pictureCaption.textContent = name; 
+pictureElement.alt = name;
+pictureElement.src = link;
     openModal(imageModal);
 }
-//1. card.js
-function renderCard(name, link, container){
-const newCard = getCardElement(name, link);
+
+function createCard(data) {
+  const card = new Card(data, "#card-template", handlePreviewPicture);
+  return card.generateCard();
+}
+
+function renderCard(cardData, container){
+const newCard = createCard(cardData);
 container.prepend(newCard);
 }
 
-function getCardElement(name, link){
-const cardElement = cardTemplate.cloneNode(true);
-const cardTitle = cardElement.querySelector(".card__title");
-const cardImage = cardElement.querySelector(".card__image");
-const likeButton = cardElement.querySelector(".card__like-button");
-const deleteButton = cardElement.querySelector(".card__delete-button");
-cardImage.src = link;
-cardImage.alt = name;
-cardTitle.textContent = name;
-likeButton.addEventListener("click", handleLikeButton);
-deleteButton.addEventListener("click", handleDeleteButton);
-cardImage.addEventListener("click", () => {
-handlePreviewPicture({ name, link });
+initialCards.forEach((item) => {
+renderCard(item, cardsContainer);
 });
-return cardElement;
-}
-//1. card.js
 
-//14. Esta función irá en FormValidator
 function handleCardFormSubmit(evt){
-    evt.preventDefault(); // sin esto la página se refresca
-    renderCard(
-        cardNameInput.value, // solo necesito el texto del input, asi lo recibe la funcion
-        cardLinkInput.value, // y acá solo la URL como string
-        cardsContainer
-    );
-    cardNameInput.value = ""; // reseteo los campos para la próxima
+    evt.preventDefault();
+    const cardData = {
+        name: cardLinkInput.value,
+        link: cardLinkInput.value,
+    };
+    renderCard(cardData, cardsContainer);
+
+    cardNameInput.value = "";
     cardLinkInput.value = "";
-    closeModal(newCardModal); // cierro el modal y listo
+    closeModal(newCardModal);
     
 };
 
-//15. Estos event listeners irán en un método público setEventListeners() en FormValidator 
-//Event listeners
 openProfileEditButton.addEventListener("click", () => {
 handleOpenEditModal();
 });
@@ -186,9 +160,6 @@ closeAddNewCardButton.addEventListener("click", () =>{
 });
 closeImageModalButton.addEventListener("click", () =>{
     closeModal(imageModal);
-});
-initialCards.forEach(card => {
-renderCard(card.name, card.link, cardsContainer);
 });
 newCardForm.addEventListener("submit", handleCardFormSubmit,);
 editProfileModal.addEventListener('submit', handleProfileFormSubmit);
@@ -235,53 +206,6 @@ function checkInputValidity (formElement, inputElement) {
     }
 };
 
-//Close modal click overlay
-function closePopupOverlay (popupOverlay){
-    popupOverlay.addEventListener('mousedown', (evt) => {
-        if (evt.target === evt.currentTarget) {
-            closeModal(popupOverlay);
-        }
-    });
-}
 closePopupOverlay (editProfileModal);
 closePopupOverlay (newCardModal);
 closePopupOverlay (imageModal);
-
-//Close modal esc key
-function handleEscClose (evt){
-    if (evt.key === "Escape") {
-        const openedPopup = document.querySelector('.popup_is-opened');
-        if (openedPopup) {
-            closeModal(openedPopup);
-        }
-    }
-}
-
-/*Se queda:
-import { Card } from "./Card.js";
-import { openModal } from "./utils.js";
-
-const cardsContainer = document.querySelector(".cards__list");
-const imageModal = document.querySelector("#image-popup");
-const pictureElement = imageModal.querySelector(".popup__image");
-const pictureCaption = imageModal.querySelector(".popup__caption");
-
-//función global handle que le pasamos a Card.js para hacer el preview de la imagen
-function handlePreviewPicture({ name, link }) {
-  pictureElement.src = link;
-  pictureElement.alt = name;
-  pictureCaption.textContent = name;
-  openModal(imageModal);
-}
-
-function createCard(data) {
-  const card = new Card(data, "#card-template", handlePreviewPicture);
-  return card.generateCard();
-}
-
-crear una card desde initialCards
-initialCards.forEach((item) => {
-  const card = new Card(item, "#card-template", handlePreviewPicture);
-  const cardElement = card.generateCard();
-  cardsContainer.prepend(cardElement);
-}); */
