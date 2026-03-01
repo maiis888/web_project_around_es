@@ -33,6 +33,7 @@ _handleLikeButton(){
 }
 _handleDeleteButton(){
     this._element.remove();
+    this._element = null;
 }
 
 //Método público

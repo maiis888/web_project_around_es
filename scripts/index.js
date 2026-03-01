@@ -266,12 +266,17 @@ const imageModal = document.querySelector("#image-popup");
 const pictureElement = imageModal.querySelector(".popup__image");
 const pictureCaption = imageModal.querySelector(".popup__caption");
 
-función que le pasamos a Card para hacer el preview
+//función global handle que le pasamos a Card.js para hacer el preview de la imagen
 function handlePreviewPicture({ name, link }) {
   pictureElement.src = link;
   pictureElement.alt = name;
   pictureCaption.textContent = name;
   openModal(imageModal);
+}
+
+function createCard(data) {
+  const card = new Card(data, "#card-template", handlePreviewPicture);
+  return card.generateCard();
 }
 
 crear una card desde initialCards
