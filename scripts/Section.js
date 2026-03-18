@@ -14,8 +14,8 @@ export class Section{
 
 renderItems() {
     this._items.forEach(item => {
-    const element = this._renderer(item);  // Crea el elemento
-    this.addItem(element);                 // Lo agrega al contenedor
+    const element = this._renderer(item);
+    this.addItem(element);
     });
 }
 
