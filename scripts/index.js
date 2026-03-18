@@ -1,6 +1,7 @@
-import { openModal, closeModal, handleEscClose, closePopupOverlay } from "./utils.js";
 import { Card } from "./Card.js";
 import { FormValidator } from "./FormValidator.js";
+import { PopupWithForm } from "./PopupWithForm.js";
+import { PopupWithImage } from "./PopupWithImage.js";
 
 const initialCards = [
     {
@@ -70,33 +71,9 @@ const cardNameError = newCardForm.querySelector('.place-name-input-error');
 const linkError = newCardForm.querySelector('.link-input-error');
 
 //Funciones
-function fillProfileForm () {
-nameInput.value = profileTitle.textContent;
-descriptionInput.value = profileDescription.textContent;
-}
-
-function handleOpenEditModal(){
-    fillProfileForm();
-    openModal(editProfileModal);
-}
-
-function handleProfileFormSubmit(evt) {
-    evt.preventDefault();
-    profileTitle.textContent = nameInput.value;
-    profileDescription.textContent = descriptionInput.value;
-    closeModal(editProfileModal);
-}
-
-function handlePreviewPicture({name, link}){
-pictureCaption.textContent = name; 
-pictureElement.alt = name;
-pictureElement.src = link;
-    openModal(imageModal);
-}
-
 function createCard(data) {
-  const card = new Card(data, "#card-template", handlePreviewPicture);
-  return card.generateCard();
+    const card = new Card(data, "#card-template", handleCardClick);
+    return card.generateCard();
 }
 
 function renderCard(cardData, container){
@@ -108,42 +85,6 @@ initialCards.forEach((item) => {
 renderCard(item, cardsContainer);
 });
 
-function handleCardFormSubmit(evt){
-    evt.preventDefault();
-    const cardData = {
-        name: cardNameInput.value,
-        link: cardLinkInput.value,
-    };
-    renderCard(cardData, cardsContainer);
-
-    cardNameInput.value = "";
-    cardLinkInput.value = "";
-    closeModal(newCardModal);
-    
-};
-
-openProfileEditButton.addEventListener("click", () => {
-handleOpenEditModal();
-});
-openAddNewCardButton.addEventListener("click", () =>{
-    openModal(newCardModal);
-});
-closeProfileEditButton.addEventListener("click", () =>{
-    closeModal(editProfileModal);
-});
-closeAddNewCardButton.addEventListener("click", () =>{
-    closeModal(newCardModal);
-});
-closeImageModalButton.addEventListener("click", () =>{
-    closeModal(imageModal);
-});
-newCardForm.addEventListener("submit", handleCardFormSubmit,);
-profileForm.addEventListener("submit", handleProfileFormSubmit);
-
-closePopupOverlay (editProfileModal);
-closePopupOverlay (newCardModal);
-closePopupOverlay (imageModal);
-
 //Para FormValidator.js
 const validationConfig = {
     inputSelector: ".popup__input",
@@ -153,9 +94,45 @@ const validationConfig = {
     errorMessageClass: "popup__input-error_active",
 }
 
-//instancias de clase de FormValidator para cada formulario
+//Instancias de clase de FormValidator para cada formulario
 const profileFormValidator = new FormValidator(validationConfig, profileForm);
 profileFormValidator.setEventListeners();
 
 const newCardValidator = new FormValidator(validationConfig, newCardForm);
 newCardValidator.setEventListeners();
+
+
+//Instancia de clase popupWithImage
+const imagePopup = new PopupWithImage("#image-popup");
+imagePopup.setEventListeners();
+
+function handleCardClick(data) {
+    imagePopup.open(data);
+}
+
+//Instancia de clase popupWithForm
+const profilePopup = new PopupWithForm("#edit-popup", (data) => {
+    profileTitle.textContent = data.name;
+    profileDescription.textContent = data.description;
+});
+profilePopup.setEventListeners();
+
+openProfileEditButton.addEventListener("click", () => {
+  nameInput.value = profileTitle.textContent;
+  descriptionInput.value = profileDescription.textContent;
+  profilePopup.open();
+});
+
+//Instancia de clase popupWithForm
+const cardPopup = new PopupWithForm("#new-card-popup", (data) => {
+  const newCard = createCard({
+    name: data["place-name"],
+    link: data.link
+  });
+  cardsContainer.prepend(newCard);
+});
+cardPopup.setEventListeners();
+
+openAddNewCardButton.addEventListener("click", () => {
+  cardPopup.open();
+});
